@@ -75,7 +75,7 @@ def tweetGame():
 	champion = champion['name']
 	# Retrieves information about the map you're playing on
 	mapID = game['mapId']
-	mapID=str(mapID)
+	mapID = str(mapID)
 	mapname = getMapName(key)
 	mapname = mapname['data'][mapID]['mapName']
 	mapname = mapname.replace("Summoners", "Summoner's")
