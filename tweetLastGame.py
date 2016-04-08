@@ -1,5 +1,6 @@
 import requests
 import twitter
+import time
 
 # Retrieves information about the player from Riot servers
 def getSumInfo(summonername, key):
@@ -31,11 +32,11 @@ def getMatchInfo(matchID, key):
 	response = requests.get(url)
 	return response.json()
 	
-def tweetLast():
+def tweetLast(count):
 	# Retrieves the information from userInfo.txt and applies it to the corresponding variables
-	f = open('userInfo.txt')
+	userInfo = open('userInfo.txt')
 	content = []
-	for line in f:
+	for line in userInfo:
 		content.append(line.rstrip('\n'))
 	summonername = content[0]
 	key = content[1]
@@ -87,14 +88,27 @@ def tweetLast():
 	assists = gamelist['games'][0]['stats']['assists']
 	assists = str(assists)
 	# If your most recent game was a ranked game, retrieve your Account ID to append to the Match History link
+	# Currently not in use due to errors, will try to reimplement
 	accountID=""
-	if "RANKED" in gamelist['games'][0]['subType']:
-		matchDet = getMatchInfo(game, key)
-		for n in range(0,10):
-			if matchDet['participantIdentities'][n]['player']['summonerName'] == summonername:
-				accountID = matchDet['participantIdentities'][n]['player']['matchHistoryUri']
-				continue
-		accountID = accountID[28:]
+	# if "RANKED" in gamelist['games'][0]['subType']:
+		# matchDet = getMatchInfo(game, key)
+		# for n in range(0,10):
+			# if matchDet['participantIdentities'][n]['player']['summonerName'] == summonername:
+				# accountID = matchDet['participantIdentities'][n]['player']['matchHistoryUri']
+				# continue
+		# accountID = accountID[28:]
+	# Checks against the file created in tweetMyGame to make sure the servers have updated
+	latestInfo = open('DONOTTOUCH.txt')
+	latestContent = []
+	for line in latestInfo:
+		latestContent.append(line.rstrip('\n'))
+	if champion != latestContent[0] or map != latestContent[1]:
+		print "Still waiting on the servers to update... %d" % count
+		time.sleep(5)
+		tweetLast(count + 1)
+		return
+	
+	print "Sending tweet on previous game."
 	
 	#Format string, send the tweet
 	stringtotweet = summonername + " just went " + kills + "/" + deaths + "/" + assists + " as " + champion + " in a " + winloss + " on the " + map + ". #LeagueofLegends http://matchhistory.na.leagueoflegends.com/en/#match-details/NA1/" + game + accountID + "?tab=overview"
