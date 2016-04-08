@@ -39,7 +39,7 @@ def tweetLast():
 		content.append(line.rstrip('\n'))
 	summonername = content[0]
 	key = content[1]
-	my_auth = twitter.OAuth(content[2],content[3],'7SnvaqobLPRpp4PYByXHTkEQy','ZI9jFQPwwUf9NcScVIq9j3zXNuc6CmmdUmIVW5Cwr69Ul0JhWu')
+	my_auth = twitter.OAuth(content[2],content[3],content[4],content[5])
 	
 	# Retrieves remaining variables from the API and formats them
 	# Retrieve and format summoner information
