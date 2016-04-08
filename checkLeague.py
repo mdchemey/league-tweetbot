@@ -1,6 +1,3 @@
-# Thanks to Farzain M., Riot Games, Twitter, Mike Verdone, ActiveState, and the creators of setuptools for building resources or API's used in this project,
-# as well as various Stack Overflow users for assistance in formatting various commands and recommending appropriate libraries
-
 import os
 import time
 import subprocess
@@ -39,7 +36,6 @@ def looper(a):
 			tweetLastGame.tweetLast()
 			looper(a)
 
-# checks to make sure your userInfo.txt file is filled out properly, then starts the loop
 def main():
 	a=False
 	looper(a)
