@@ -42,14 +42,18 @@ def tweetLast():
 	my_auth = twitter.OAuth(content[2],content[3],'7SnvaqobLPRpp4PYByXHTkEQy','ZI9jFQPwwUf9NcScVIq9j3zXNuc6CmmdUmIVW5Cwr69Ul0JhWu')
 	
 	# Retrieves remaining variables from the API and formats them
+	# Retrieve and format summoner information
 	summoner=getSumInfo(summonername, key)
 	ID = summoner[summonername]['id']
 	ID = str(ID)
 	summonername = summoner[summonername]['name']
+	# Retrieve your recent games and the list of maps to refer to
 	gamelist = getRecentMatch(ID, key)
 	maplist = getMaps(key)
+	# Retrieve the game ID of your latest game
 	game = gamelist['games'][0]['gameId']
 	game = str(game)
+	# Retrieve and format the map information of your latest game
 	map = gamelist['games'][0]['mapId']
 	map = str(map)
 	map = maplist['data'][map]['mapName']
@@ -63,22 +67,26 @@ def tweetLast():
 	for i in map:
 		if i.isupper() and i is not map[0]:
 			map = map.replace(i, " " + i)
+	# Retrieve and format the information on the champion you played in your latest game
 	champion = gamelist['games'][0]['championId']
 	champion = str(champion)
 	champion = getChamp(champion, key)
 	champion = champion['name']
+	# Retrieve if you won or lost your most recent game
 	winloss = gamelist['games'][0]['stats']['win']
 	winloss = str(winloss)
 	if winloss == 'True':
 		winloss = "win"
 	else: 
 		winloss = "loss"
+	# Retrieve your K/D/A from your most recent game
 	kills = gamelist['games'][0]['stats']['championsKilled']
 	kills = str(kills)
 	deaths = gamelist['games'][0]['stats']['numDeaths']
 	deaths = str(deaths)
 	assists = gamelist['games'][0]['stats']['assists']
 	assists = str(assists)
+	# If your most recent game was a ranked game, retrieve your Account ID to append to the Match History link
 	accountID=""
 	if "RANKED" in gamelist['games'][0]['subType']:
 		matchDet = getMatchInfo(game, key)
