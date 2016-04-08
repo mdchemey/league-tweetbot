@@ -37,7 +37,7 @@ You will then need to empty the placeholder 'userInfo.txt' file and fill it out 
 
 Save 'userInfo.txt' and close it and your Twitter application's tab; you won't need either from here on out.
 
-If you don't want to bundle the project into a standalone .exe file which can run in the background, you're done. Just make sure all the files from this project are in the same folder (you can delete both .bat files; you won't use them . You can run the project by double-clicking on 'checkLeague.py' in the file explorer.
+If you don't want to bundle the project into a standalone .exe file which can run in the background, you're done. Just make sure all the files from this project are in the same folder (you can delete both .bat files; you won't use them unless you want to later bundle it into a .exe). You can run the project by double-clicking on 'checkLeague.py' in the file explorer.
 
 If you DO want to bundle the project into a standalone .exe file, you have a couple steps to go:
 * First, you have to decide if you want to make the program open a window that gives feedback on the program's status when it runs (but can not be closed without stopping the program) or if you want it to run in the background (meaning it can only be closed from the Task Manager but will run completely without disturbing you)
