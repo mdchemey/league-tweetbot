@@ -46,4 +46,8 @@ If you DO want to bundle the project into a standalone .exe file, you have a cou
 * The program is now built! You'll find 'checkLeague.exe' in (folder you started in)\dist\checkLeague.
 * You can now safely copy 'checkLeague.exe' anywhere you want, as long as you also copy 'userInfo.txt' (which was automatically copied into the \dist\checkLeague folder but can also be found in your original folder) to the same location.
 
-Once running, 'checkLeague.exe' will wait for a game of League of Legends to start on your computer, then tweet "<Summoner Name> is playing <Champion> on the <Map>. #LeagueOfLegends. Beep boop, this tweet was automated." It will then wait for the game to end, then pull up information about the game's results and tweet "<Summoner Name> just went <K/D/A> as <Champion> in a <Win/Loss> on the <Map>. #LeagueOfLegends <Match History Link to that game>
+Once running, 'checkLeague.exe' will wait for a game of League of Legends to start on your computer, then tweet "(Summoner Name) is playing (Champion) on the (Map). #LeagueOfLegends. Beep boop, this tweet was automated." 
+
+It will then wait for the game to end, then pull up information about the game's results and tweet "(Summoner Name) just went (K/D/A) as (Champion) in a (Win/Loss) on the (Map). #LeagueOfLegends (Match History Link to that game)
+
+When running, the program will create a file named 'DONOTTOUCH.txt' and, as the filename suggests, you should not change the contents of that file. If you mess with it during a game, the program will break and/or get stuck in an infinite loop which prevents you from using it until you restart it.
