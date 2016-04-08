@@ -36,11 +36,14 @@ def tweetGame():
 	my_auth = twitter.OAuth(content[2],content[3],'7SnvaqobLPRpp4PYByXHTkEQy','ZI9jFQPwwUf9NcScVIq9j3zXNuc6CmmdUmIVW5Cwr69Ul0JhWu')
 	
 	# Retrieves remaining variables from the API and formats them
+	# Retrieves summoner information
 	getname = getSumName(summonername, key)
 	ID = getname[summonername]['id']
 	ID = str(ID)
 	summonername = getname[summonername]['name']
+	# Retrieves information about your current game
 	game = getCurrentGameData(ID, key)
+	# Retrieves which participant position you are in (tried 'for n in range (0,10)' to replace this if chain but consistently returned errors)
 	val = 0
 	if game['participants'][0]['summonerId'] == int(ID):
 		val = 0
@@ -65,10 +68,12 @@ def tweetGame():
 	else:
 		print "Player not found."
 		exit()
+	# Retrieves information about your Champion
 	champion = game['participants'][val]['championId']
 	champion = str(champion)
 	champion = getChampName(champion, key)
 	champion = champion['name']
+	# Retrieves information about the map you're playing on
 	mapID = game['mapId']
 	mapID=str(mapID)
 	mapname = getMapName(key)
