@@ -23,8 +23,9 @@ def looper(a):
 		a=findProcess("League of Legends.exe")
 		# when a game starts, it runs a script to tweet information about the game
 		if a is True:
-			print "Sending Tweet"
+			print "Game started. Sending tweet on current game."
 			tweetMyGame.tweetGame()
+			print "Waiting for game to end."
 			continue
 		time.sleep(10)
 	# after tweeting, it waits until the game ends and then starts the loop over
@@ -32,8 +33,8 @@ def looper(a):
 		time.sleep(10)
 		a=findProcess("League of Legends.exe")
 		if a is False:
-			time.sleep(5)
-			tweetLastGame.tweetLast()
+			print "Game ended. Waiting for Match History servers to update."
+			tweetLastGame.tweetLast(1)
 			looper(a)
 
 def main():
