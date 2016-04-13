@@ -90,11 +90,14 @@ def tweetGame():
 			mapname = mapname.replace(i, " " + i)
 	
 	# Saves some information to a file so tweetLastGame can check against it to see if the servers have updated
+	print "Writing game info to file."
 	saveinfo = open('DONOTTOUCH.txt','w')
 	saveinfo.write(champion)
 	saveinfo.write('\n')
 	saveinfo.write(mapname)
 	saveinfo.close()
+	
+	print "Sending tweet on current game."
     
 	# Format string, send the tweet
 	stringtotweet = summonername + " is playing " + champion + " on the " + mapname + ". #LeagueOfLegends\n\nBeep boop, this tweet was automated "
