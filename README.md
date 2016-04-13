@@ -51,3 +51,7 @@ Once running, 'checkLeague.exe' will wait for a game of League of Legends to sta
 It will then wait for the game to end, then pull up information about the game's results and tweet "(Summoner Name) just went (K/D/A) as (Champion) in a (Win/Loss) on the (Map). #LeagueOfLegends (Match History Link to that game)
 
 When running, the program will create a file named 'DONOTTOUCH.txt' and, as the filename suggests, you should not change the contents of that file. If you mess with it during a game, the program will break and/or get stuck in an infinite loop which prevents you from using it until you restart it.
+
+KNOWN ISSUES IN v0.2:
+
+If you play one champion on the same map within a short number of games, Twitter will return an error due to its rule against repeated tweets. Additionally, if you play the same champion on the same map two or more times in a row, the server check will prematurely succeed, resulting in it retrieving data for the wrong game. May create fixes for v0.3; in the meantime, I would recommend trying to vary champion picks a bit.
