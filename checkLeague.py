@@ -23,7 +23,7 @@ def looper(a):
 		a=findProcess("League of Legends.exe")
 		# when a game starts, it runs a script to tweet information about the game
 		if a is True:
-			print "Game started. Sending tweet on current game."
+			print "Game started. Preparing tweet for current game."
 			tweetMyGame.tweetGame()
 			print "Waiting for game to end."
 			continue

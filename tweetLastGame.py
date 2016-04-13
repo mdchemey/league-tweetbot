@@ -88,15 +88,14 @@ def tweetLast(count):
 	assists = gamelist['games'][0]['stats']['assists']
 	assists = str(assists)
 	# If your most recent game was a ranked game, retrieve your Account ID to append to the Match History link
-	# Currently not in use due to errors, will try to reimplement
 	accountID=""
-	# if "RANKED" in gamelist['games'][0]['subType']:
-		# matchDet = getMatchInfo(game, key)
-		# for n in range(0,10):
-			# if matchDet['participantIdentities'][n]['player']['summonerName'] == summonername:
-				# accountID = matchDet['participantIdentities'][n]['player']['matchHistoryUri']
-				# continue
-		# accountID = accountID[28:]
+	if "RANKED" in gamelist['games'][0]['subType'] and "UN" not in gamelist['games'][0]['subType']:
+		matchDet = getMatchInfo(game, key)
+		for n in range(0,10):
+			if matchDet['participantIdentities'][n]['player']['summonerName'] == summonername:
+				accountID = matchDet['participantIdentities'][n]['player']['matchHistoryUri']
+				continue
+		accountID = accountID[28:]
 	# Checks against the file created in tweetMyGame to make sure the servers have updated
 	latestInfo = open('DONOTTOUCH.txt')
 	latestContent = []
