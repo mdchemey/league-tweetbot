@@ -41,8 +41,8 @@ If you don't want to bundle the project into a standalone .exe file which can ru
 
 If you DO want to bundle the project into a standalone .exe file, you have a couple steps to go:
 * First, you have to decide if you want to make the program open a window that gives feedback on the program's status when it runs (but can not be closed without stopping the program) or if you want it to run in the background (meaning it can only be closed from the Task Manager but will run completely without disturbing you)
-* Then, if you want to run it in a window, just double-click on the 'bundle-w.bat' file and let it run. It should create two folders ('build' and 'dist') and one file ('checkLeague.spec') if successful.
-* If you want to run it in the background, just double-click on the 'bundle-b.bat' file and let it run. It should create two folders ('build' and 'dist') and one file ('checkLeague.spec') if successful.
+* Then, if you want to run it in a window so you can view some basic status messages, just double-click on the 'bundle-w.bat' file (or run it in the command line) and let it run. It should create two folders ('build' and 'dist') and one file ('checkLeague.spec') if successful.
+* If you want to run it in the background for convenience, just double-click on the 'bundle-b.bat' file (or run it in the command line) and let it run. It should create two folders ('build' and 'dist') and one file ('checkLeague.spec') if successful.
 * The program is now built! You'll find 'checkLeague.exe' in (folder you started in)\dist\checkLeague.
 * You can now safely copy 'checkLeague.exe' anywhere you want, as long as you also copy 'userInfo.txt' (which was automatically copied into the \dist\checkLeague folder but can also be found in your original folder) to the same location.
 
