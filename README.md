@@ -46,12 +46,13 @@ If you DO want to bundle the project into a standalone .exe file, you have a cou
 * The program is now built! You'll find 'checkLeague.exe' in (folder you started in)\dist\checkLeague.
 * You can now safely copy 'checkLeague.exe' anywhere you want, as long as you also copy 'userInfo.txt' (which was automatically copied into the \dist\checkLeague folder but can also be found in your original folder) to the same location.
 
-Once running, 'checkLeague.exe' will wait for a game of League of Legends to start on your computer, then tweet "(Summoner Name) is playing (Champion) on the (Map). #LeagueOfLegends. Beep boop, this tweet was automated." 
+Once running, 'checkLeague.exe' will wait for a game of League of Legends to start on your computer, then tweet "(Summoner Name) is playing (Champion) on the (Map). #LeagueOfLegends" 
 
 It will then wait for the game to end, then pull up information about the game's results and tweet "(Summoner Name) just went (K/D/A) as (Champion) in a (Win/Loss) on the (Map). #LeagueOfLegends (Match History Link to that game)
 
 When running, the program will create a file named 'DONOTTOUCH.txt' and, as the filename suggests, you should not change the contents of that file. If you mess with it during a game, the program will break and/or get stuck in an infinite loop which prevents you from using it until you restart it.
 
-KNOWN ISSUES IN v0.2:
+KNOWN ISSUES IN v0.3:
 
-If you play one champion on the same map within a short number of games, Twitter will return an error due to its rule against repeated tweets. Additionally, if you play the same champion on the same map two or more times in a row, the server check will prematurely succeed, resulting in it retrieving data for the wrong game. May create fixes for v0.3; in the meantime, I would recommend trying to vary champion picks a bit.
+* SSL is not integrated, so you will get warnings about an insecure connection in the log for each call made. This should not interfere with functionality at all, but I would like to get SSL working in the future.
+* In tweetMyGame, the chain of if statements from lines 77 to 99 is horribly inefficient and I'll experiment with a loop fix. It works fine, but I would like to improve it if possible.
