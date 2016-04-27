@@ -41,17 +41,18 @@ If you don't want to bundle the project into a standalone .exe file which can ru
 
 If you DO want to bundle the project into a standalone .exe file, you have a couple steps to go:
 * First, you have to decide if you want to make the program open a window that gives feedback on the program's status when it runs (but can not be closed without stopping the program) or if you want it to run in the background (meaning it can only be closed from the Task Manager but will run completely without disturbing you)
-* Then, if you want to run it in a window, just double-click on the 'bundle-w.bat' file and let it run. It should create two folders ('build' and 'dist') and one file ('checkLeague.spec') if successful.
-* If you want to run it in the background, just double-click on the 'bundle-b.bat' file and let it run. It should create two folders ('build' and 'dist') and one file ('checkLeague.spec') if successful.
+* Then, if you want to run it in a window so you can view some basic status messages, just double-click on the 'bundle-w.bat' file (or run it in the command line) and let it run. It should create two folders ('build' and 'dist') and one file ('checkLeague.spec') if successful.
+* If you want to run it in the background for convenience, just double-click on the 'bundle-b.bat' file (or run it in the command line) and let it run. It should create two folders ('build' and 'dist') and one file ('checkLeague.spec') if successful.
 * The program is now built! You'll find 'checkLeague.exe' in (folder you started in)\dist\checkLeague.
 * You can now safely copy 'checkLeague.exe' anywhere you want, as long as you also copy 'userInfo.txt' (which was automatically copied into the \dist\checkLeague folder but can also be found in your original folder) to the same location.
 
-Once running, 'checkLeague.exe' will wait for a game of League of Legends to start on your computer, then tweet "(Summoner Name) is playing (Champion) on the (Map). #LeagueOfLegends. Beep boop, this tweet was automated." 
+Once running, 'checkLeague.exe' will wait for a game of League of Legends to start on your computer, then tweet "(Summoner Name) is playing (Champion) on the (Map). #LeagueOfLegends" 
 
 It will then wait for the game to end, then pull up information about the game's results and tweet "(Summoner Name) just went (K/D/A) as (Champion) in a (Win/Loss) on the (Map). #LeagueOfLegends (Match History Link to that game)
 
 When running, the program will create a file named 'DONOTTOUCH.txt' and, as the filename suggests, you should not change the contents of that file. If you mess with it during a game, the program will break and/or get stuck in an infinite loop which prevents you from using it until you restart it.
 
-KNOWN ISSUES IN v0.2:
+KNOWN ISSUES IN v0.3:
 
-If you play one champion on the same map within a short number of games, Twitter will return an error due to its rule against repeated tweets. Additionally, if you play the same champion on the same map two or more times in a row, the server check will prematurely succeed, resulting in it retrieving data for the wrong game. May create fixes for v0.3; in the meantime, I would recommend trying to vary champion picks a bit.
+* SSL is not integrated, so you will get warnings about an insecure connection in the log for each call made. This should not interfere with functionality at all, but I would like to get SSL working in the future.
+* In tweetMyGame, the chain of if statements from lines 77 to 99 is horribly inefficient and I'll experiment with a loop fix. It works fine, but I would like to improve it if possible.
