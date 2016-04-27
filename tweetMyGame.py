@@ -1,29 +1,48 @@
 import requests
 import twitter
+import time
+import logging
 
 # Retrieves information about the player's current game from Riot servers
 def getCurrentGameData(ID, key):
-    url = "https://na.api.pvp.net/observer-mode/rest/consumer/getSpectatorGameInfo/NA1/" + ID + "?api_key=" + key
-    response = requests.get(url)
-    return response.json()
+	url = "https://na.api.pvp.net/observer-mode/rest/consumer/getSpectatorGameInfo/NA1/" + ID + "?api_key=" + key
+	response = requests.get(url)
+	return response.json()
 
 # Retrieves information about the player from Riot servers
-def getSumName(summonername, key):
-    url = "https://na.api.pvp.net/api/lol/na/v1.4/summoner/by-name/" + summonername + "?api_key=" + key
-    response = requests.get(url)
-    return response.json()
+def getSumInfo(summonername, key):
+	url = "https://na.api.pvp.net/api/lol/na/v1.4/summoner/by-name/" + summonername + "?api_key=" + key
+	response = requests.get(url)
+	return response.json()
 	
 # Retrieves the name of the champion the player is playing from Riot servers
 def getChampName(ID, key):
-    url = "https://global.api.pvp.net/api/lol/static-data/na/v1.2/champion/" + ID + "?api_key=" + key
-    response = requests.get(url)
-    return response.json()
+	url = "https://global.api.pvp.net/api/lol/static-data/na/v1.2/champion/" + ID + "?api_key=" + key
+	response = requests.get(url)
+	return response.json()
 
 # Retrieves the name of the map the player is using from Riot servers
-def getMapName(key):
-    url = "https://global.api.pvp.net/api/lol/static-data/na/v1.2/map?api_key=" + key
-    response = requests.get(url)
-    return response.json()
+def getMaps(key):
+	url = "https://global.api.pvp.net/api/lol/static-data/na/v1.2/map?api_key=" + key
+	response = requests.get(url)
+	return response.json()
+
+def sendTweet(string, my_auth, count):
+	twit = twitter.Twitter(auth=(my_auth))
+	try:
+		twit.statuses.update(status = string)
+		print string
+		logging.info("Tweet sent: \"" + string + "\"")
+	except:
+		if count>5:
+			print "Sending current game tweet failed."
+			logging.exception("Sending current game tweet failed.")
+		else: 
+			print "Sending tweet failed. Trying again... %d " % count
+			logging.exception("Sending tweet failed. Trying again... %d " % count)
+			time.sleep(5)
+			sendTweet(string, my_auth, count + 1)
+			return
 
 def tweetGame():
 	# Retrieves the information from userInfo.txt and applies it to the corresponding variables
@@ -31,18 +50,28 @@ def tweetGame():
 	content = []
 	for line in f:
 		content.append(line.rstrip('\n'))
+	f.close()
 	summonername = content[0]
 	key = content[1]
 	my_auth = twitter.OAuth(content[2],content[3],content[4],content[5])
 	
 	# Retrieves remaining variables from the API and formats them
 	# Retrieves summoner information
-	getname = getSumName(summonername, key)
-	ID = getname[summonername]['id']
+	try:
+		summoner = getSumInfo(summonername, key)
+	except:
+		logging.exception('Could not retrieve summoner data.')
+	ID = summoner[summonername]['id']
 	ID = str(ID)
-	summonername = getname[summonername]['name']
+	summonername = summoner[summonername]['name']
+	
 	# Retrieves information about your current game
-	game = getCurrentGameData(ID, key)
+	try:
+		game = getCurrentGameData(ID, key)
+	except:
+		logging.exception('Could not retrieve current game data.')
+	gameID = game['gameId']
+	
 	# Retrieves which participant position you are in (tried 'for n in range (0,10)' to replace this if chain but consistently returned errors)
 	val = 0
 	if game['participants'][0]['summonerId'] == int(ID):
@@ -67,16 +96,24 @@ def tweetGame():
 		val = 9
 	else:
 		print "Player not found."
-		exit()
+		logging.info("Player not found.")
+		
 	# Retrieves information about your Champion
 	champion = game['participants'][val]['championId']
 	champion = str(champion)
-	champion = getChampName(champion, key)
+	try:
+		champion = getChampName(champion, key)
+	except:
+		logging.exception('Could not retrieve champion data.')
 	champion = champion['name']
+	
 	# Retrieves information about the map you're playing on
 	mapID = game['mapId']
 	mapID = str(mapID)
-	mapname = getMapName(key)
+	try:
+		mapname = getMaps(key)
+	except:
+		logging.exception('Could not retrieve map data.')
 	mapname = mapname['data'][mapID]['mapName']
 	mapname = mapname.replace("Summoners", "Summoner's")
 	if mapname.endswith("New"):
@@ -91,16 +128,13 @@ def tweetGame():
 	
 	# Saves some information to a file so tweetLastGame can check against it to see if the servers have updated
 	print "Writing game info to file."
-	saveinfo = open('DONOTTOUCH.txt','w')
-	saveinfo.write(champion)
-	saveinfo.write('\n')
-	saveinfo.write(mapname)
-	saveinfo.close()
-	
-	print "Sending tweet on current game."
-    
+	logging.info("Writing game info to file.")
+	writesave = open('DONOTTOUCH.txt','w')
+	lines=[summonername+"\n",ID+"\n",champion+"\n",mapname+"\n",str(gameID)]
+	writesave.writelines(lines)
+
 	# Format string, send the tweet
-	stringtotweet = summonername + " is playing " + champion + " on the " + mapname + ". #LeagueOfLegends\n\nBeep boop, this tweet was automated "
-	print stringtotweet
-	twit = twitter.Twitter(auth=(my_auth))
-	twit.statuses.update(status = stringtotweet)
+	print "Sending tweet on current game."
+	logging.info("Sending tweet on current game.")
+	stringtotweet = summonername + " is playing " + champion + " on the " + mapname + ". #LeagueOfLegends"
+	sendTweet(stringtotweet, my_auth, 1)
