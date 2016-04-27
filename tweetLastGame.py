@@ -1,24 +1,7 @@
 import requests
 import twitter
 import time
-
-# Retrieves information about the player from Riot servers
-def getSumInfo(summonername, key):
-    url = "https://na.api.pvp.net/api/lol/na/v1.4/summoner/by-name/" + summonername + "?api_key=" + key
-    response = requests.get(url)
-    return response.json()
-	
-# Retrieves the champion information the player used from Riot servers
-def getChamp(ID, key):
-    url = "https://global.api.pvp.net/api/lol/static-data/na/v1.2/champion/" + ID + "?api_key=" + key
-    response = requests.get(url)
-    return response.json()
-
-# Retrieves the name of the map the player used from Riot servers
-def getMaps(key):
-    url = "https://global.api.pvp.net/api/lol/static-data/na/v1.2/map?api_key=" + key
-    response = requests.get(url)
-    return response.json()
+import logging
 	
 # Retrieves the basic information of your most recent match from Riot servers
 def getRecentMatch(ID, key):
@@ -27,10 +10,27 @@ def getRecentMatch(ID, key):
 	return response.json()
 
 # Retrieves more detailed information about your most recent match (using getRecentMatch's result) from Riot servers
-def getMatchInfo(matchID, key):
+def getRankedMatchInfo(matchID, key):
 	url = "https://na.api.pvp.net/api/lol/na/v2.2/match/" + matchID + "?api_key=" + key
 	response = requests.get(url)
 	return response.json()
+		
+def sendTweet(string, my_auth, count):
+	twit = twitter.Twitter(auth=(my_auth))
+	try:	
+		twit.statuses.update(status = string)
+		print string
+		logging.info("Tweet sent: \"" + string + "\"")
+	except:
+		if count>5:
+			print "Sending post-game tweet failed."
+			logging.exception("Sending post-game tweet failed.")
+		else: 
+			print "Sending tweet failed. Trying again... %d " % count
+			logging.exception("Sending tweet failed. Trying again... %d " % count)
+			time.sleep(5)
+			sendTweet(string, my_auth, count + 1)
+			return
 	
 def tweetLast(count):
 	# Retrieves the information from userInfo.txt and applies it to the corresponding variables
@@ -38,41 +38,41 @@ def tweetLast(count):
 	content = []
 	for line in userInfo:
 		content.append(line.rstrip('\n'))
-	summonername = content[0]
+	userInfo.close()
 	key = content[1]
 	my_auth = twitter.OAuth(content[2],content[3],content[4],content[5])
 	
-	# Retrieves remaining variables from the API and formats them
-	# Retrieve and format summoner information
-	summoner=getSumInfo(summonername, key)
-	ID = summoner[summonername]['id']
-	ID = str(ID)
-	summonername = summoner[summonername]['name']
-	# Retrieve your recent games and the list of maps to refer to
-	gamelist = getRecentMatch(ID, key)
-	maplist = getMaps(key)
-	# Retrieve the game ID of your latest game
-	game = gamelist['games'][0]['gameId']
-	game = str(game)
-	# Retrieve and format the map information of your latest game
-	map = gamelist['games'][0]['mapId']
-	map = str(map)
-	map = maplist['data'][map]['mapName']
-	map = map.replace("Summoners", "Summoner's")
-	if map.endswith("New"):
-		map = map[:-3]
-	if map.startswith("New"):
-		map = map[3:]
-	if "ProvingGrounds" in map:
-		map = "HowlingAbyss"
-	for i in map:
-		if i.isupper() and i is not map[0]:
-			map = map.replace(i, " " + i)
-	# Retrieve and format the information on the champion you played in your latest game
-	champion = gamelist['games'][0]['championId']
-	champion = str(champion)
-	champion = getChamp(champion, key)
-	champion = champion['name']
+	# Opens file created in tweetMyGame and retrieves information about your last game
+	latestInfo = open('DONOTTOUCH.txt')
+	latestContent = []
+	for line in latestInfo:
+		latestContent.append(line.rstrip('\n'))
+	latestInfo.close()
+	
+	summonername = latestContent[0]
+	ID = latestContent[1]
+	champion = latestContent[2]
+	map = latestContent[3]
+	game = latestContent[4]
+	
+	# Retrieve your recent games
+	try:
+		gamelist = getRecentMatch(ID, key)
+	except:
+		print "Could not retrieve recent match data. Retrying... %d" % count
+		logging.exception("Could not retrieve recent match data. Retrying... %d" % count)
+		time.sleep(5)
+		tweetLast(count + 1)
+		return
+	
+	# Wait for the servers to update to include your most recent game
+	if game != str(gamelist['games'][0]['gameId']):
+		print "Still waiting on the servers to update... %d" % count
+		logging.info("Still waiting on the servers to update... %d" % count)
+		time.sleep(5)
+		tweetLast(count + 1)
+		return
+	
 	# Retrieve if you won or lost your most recent game
 	winloss = gamelist['games'][0]['stats']['win']
 	winloss = str(winloss)
@@ -80,6 +80,7 @@ def tweetLast(count):
 		winloss = "win"
 	else: 
 		winloss = "loss"
+		
 	# Retrieve your K/D/A from your most recent game
 	kills = gamelist['games'][0]['stats']['championsKilled']
 	kills = str(kills)
@@ -87,30 +88,23 @@ def tweetLast(count):
 	deaths = str(deaths)
 	assists = gamelist['games'][0]['stats']['assists']
 	assists = str(assists)
+	
 	# If your most recent game was a ranked game, retrieve your Account ID to append to the Match History link
 	accountID=""
 	if "RANKED" in gamelist['games'][0]['subType'] and "UN" not in gamelist['games'][0]['subType']:
-		matchDet = getMatchInfo(game, key)
+		try:
+			matchDet = getRankedMatchInfo(game, key)
+		except:
+			logging.exception('Could not retrieve Ranked Match data.')
 		for n in range(0,10):
 			if matchDet['participantIdentities'][n]['player']['summonerName'] == summonername:
 				accountID = matchDet['participantIdentities'][n]['player']['matchHistoryUri']
 				continue
 		accountID = accountID[28:]
-	# Checks against the file created in tweetMyGame to make sure the servers have updated
-	latestInfo = open('DONOTTOUCH.txt')
-	latestContent = []
-	for line in latestInfo:
-		latestContent.append(line.rstrip('\n'))
-	if champion != latestContent[0] or map != latestContent[1]:
-		print "Still waiting on the servers to update... %d" % count
-		time.sleep(5)
-		tweetLast(count + 1)
-		return
 	
 	print "Sending tweet on previous game."
+	logging.info("Sending tweet on previous game.")
 	
 	#Format string, send the tweet
 	stringtotweet = summonername + " just went " + kills + "/" + deaths + "/" + assists + " as " + champion + " in a " + winloss + " on the " + map + ". #LeagueofLegends http://matchhistory.na.leagueoflegends.com/en/#match-details/NA1/" + game + accountID + "?tab=overview"
-	print stringtotweet
-	twit = twitter.Twitter(auth=(my_auth))
-	twit.statuses.update(status = stringtotweet)
+	sendTweet(stringtotweet, my_auth, 1)
