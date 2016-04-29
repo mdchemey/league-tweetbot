@@ -2,15 +2,9 @@ import requests
 import twitter
 import time
 import logging
-	
-# Retrieves the basic information of your most recent match from Riot servers
-def getRecentMatch(ID, key):
-	url = "https://na.api.pvp.net/api/lol/na/v1.3/game/by-summoner/" + ID + "/recent?api_key=" + key
-	response = requests.get(url)
-	return response.json()
 
-# Retrieves more detailed information about your most recent match (using getRecentMatch's result) from Riot servers
-def getRankedMatchInfo(matchID, key):
+# Retrieves detailed information about your most recent match from Riot servers
+def getMatchInfo(matchID, key):
 	url = "https://na.api.pvp.net/api/lol/na/v2.2/match/" + matchID + "?api_key=" + key
 	response = requests.get(url)
 	return response.json()
@@ -54,52 +48,44 @@ def tweetLast(count):
 	champion = latestContent[2]
 	map = latestContent[3]
 	game = latestContent[4]
-	
-	# Retrieve your recent games
+	pos = int(latestContent[5])
+		
+	# Retrieve data on your most recent game once the server has updated
 	try:
-		gamelist = getRecentMatch(ID, key)
+		match = getMatchInfo(game, key)
 	except:
 		print "Could not retrieve recent match data. Retrying... %d" % count
 		logging.exception("Could not retrieve recent match data. Retrying... %d" % count)
 		time.sleep(5)
 		tweetLast(count + 1)
 		return
-	
-	# Wait for the servers to update to include your most recent game
-	if game != str(gamelist['games'][0]['gameId']):
+	try:
+		# Retrieve if you won or lost your most recent game
+		team = int(pos/5)
+		winloss = match['teams'][team]['winner']
+		winloss = str(winloss)
+		if winloss == 'True':
+			winloss = "win"
+		else: 
+			winloss = "loss"
+		# Retrieve your K/D/A from your most recent game
+		kills = match['participants'][pos]['stats']['kills']
+		kills = str(kills)
+		deaths = match['participants'][pos]['stats']['deaths']
+		deaths = str(deaths)
+		assists = match['participants'][pos]['stats']['assists']
+		assists = str(assists)
+	except: 
 		print "Still waiting on the servers to update... %d" % count
 		logging.info("Still waiting on the servers to update... %d" % count)
 		time.sleep(5)
 		tweetLast(count + 1)
 		return
 	
-	# Retrieve if you won or lost your most recent game
-	winloss = gamelist['games'][0]['stats']['win']
-	winloss = str(winloss)
-	if winloss == 'True':
-		winloss = "win"
-	else: 
-		winloss = "loss"
-		
-	# Retrieve your K/D/A from your most recent game
-	kills = gamelist['games'][0]['stats']['championsKilled']
-	kills = str(kills)
-	deaths = gamelist['games'][0]['stats']['numDeaths']
-	deaths = str(deaths)
-	assists = gamelist['games'][0]['stats']['assists']
-	assists = str(assists)
-	
 	# If your most recent game was a ranked game, retrieve your Account ID to append to the Match History link
 	accountID=""
-	if "RANKED" in gamelist['games'][0]['subType'] and "UN" not in gamelist['games'][0]['subType']:
-		try:
-			matchDet = getRankedMatchInfo(game, key)
-		except:
-			logging.exception('Could not retrieve Ranked Match data.')
-		for n in range(0,10):
-			if matchDet['participantIdentities'][n]['player']['summonerName'] == summonername:
-				accountID = matchDet['participantIdentities'][n]['player']['matchHistoryUri']
-				continue
+	if "RANKED" in match['queueType'] and "UN" not in match['queueType']:
+		accountID = match['participantIdentities'][pos]['player']['matchHistoryUri']
 		accountID = accountID[28:]
 	
 	print "Sending tweet on previous game."

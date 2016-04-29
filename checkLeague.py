@@ -45,7 +45,7 @@ def looper(a):
 			try:
 				tweetLastGame.tweetLast(1)
 			except:
-				logging.exception('Program failed while attempting to tweet about current game.')
+				logging.exception('Program failed while attempting to tweet about previous game.')
 			looper(a)
 
 def main():
