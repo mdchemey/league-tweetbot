@@ -64,7 +64,7 @@ def tweetGame():
 	ID = summoner[summonername]['id']
 	ID = str(ID)
 	summonername = summoner[summonername]['name']
-	partic
+	
 	# Retrieves information about your current game
 	try:
 		game = getCurrentGameData(ID, key)
