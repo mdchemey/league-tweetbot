@@ -64,7 +64,7 @@ def tweetGame():
 	ID = summoner[summonername]['id']
 	ID = str(ID)
 	summonername = summoner[summonername]['name']
-	
+	partic
 	# Retrieves information about your current game
 	try:
 		game = getCurrentGameData(ID, key)
@@ -72,34 +72,19 @@ def tweetGame():
 		logging.exception('Could not retrieve current game data.')
 	gameID = game['gameId']
 	
-	# Retrieves which participant position you are in (tried 'for n in range (0,10)' to replace this if chain but consistently returned errors)
-	val = 0
-	if game['participants'][0]['summonerId'] == int(ID):
-		val = 0
-	elif game['participants'][1]['summonerId'] == int(ID):
-		val = 1
-	elif game['participants'][2]['summonerId'] == int(ID):
-		val = 2
-	elif game['participants'][3]['summonerId'] == int(ID):
-		val = 3
-	elif game['participants'][4]['summonerId'] == int(ID):
-		val = 4
-	elif game['participants'][5]['summonerId'] == int(ID):
-		val = 5
-	elif game['participants'][6]['summonerId'] == int(ID):
-		val = 6
-	elif game['participants'][7]['summonerId'] == int(ID):
-		val = 7
-	elif game['participants'][8]['summonerId'] == int(ID):
-		val = 8
-	elif game['participants'][9]['summonerId'] == int(ID):
-		val = 9
-	else:
-		print "Player not found."
-		logging.info("Player not found.")
+	# Retrieves which participant position you are in
+	pos = 0
+	try:
+		for n in range(0,10):
+			if game['participants'][n]['summonerId'] == int(ID):
+				pos = n
+				continue
+	except:
+			print "Player not found."
+			logging.exception("Player not found.")
 		
 	# Retrieves information about your Champion
-	champion = game['participants'][val]['championId']
+	champion = game['participants'][pos]['championId']
 	champion = str(champion)
 	try:
 		champion = getChampName(champion, key)
@@ -130,7 +115,7 @@ def tweetGame():
 	print "Writing game info to file."
 	logging.info("Writing game info to file.")
 	writesave = open('DONOTTOUCH.txt','w')
-	lines=[summonername+"\n",ID+"\n",champion+"\n",mapname+"\n",str(gameID)]
+	lines=[summonername+"\n",ID+"\n",champion+"\n",mapname+"\n",str(gameID)+"\n",str(pos)]
 	writesave.writelines(lines)
 
 	# Format string, send the tweet
