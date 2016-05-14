@@ -11,7 +11,7 @@ To build and successfully use this project, you will need:
 * Microsoft Windows
 * Python version 2.7.11: download from https://www.python.org/downloads/release/python-2711/
 * Requests: in command line, enter "pip install requests" (no quotes)
-* Setuptools (needed for Python Twitter Tools): download from https://pypi.python.org/pypi/setuptools#downloads, extract, follow the readme
+* Setuptools (needed for Python Twitter Tools): if not installed automatically with Python, download from https://pypi.python.org/pypi/setuptools#downloads, extract, follow the readme
 * Python Twitter Tools: in command line, enter "easy_install twitter" (no quotes)
 * Pyinstaller (if you want to run it as a standalone exe): pip install pyinstaller
 * A twitter account: https://www.twitter.com
@@ -52,7 +52,6 @@ It will then wait for the game to end, then pull up information about the game's
 
 When running, the program will create a file named 'DONOTTOUCH.txt' and, as the filename suggests, you should not change the contents of that file. If you mess with it during a game, the program will break and/or get stuck in an infinite loop which prevents you from using it until you restart it.
 
-KNOWN ISSUES IN v0.3:
+KNOWN ISSUES IN v0.4:
 
 * SSL is not integrated, so you will get warnings about an insecure connection in the log for each call made. This should not interfere with functionality at all, but I would like to get SSL working in the future.
-* In tweetMyGame, the chain of if statements from lines 77 to 99 is horribly inefficient and I'll experiment with a loop fix. It works fine, but I would like to improve it if possible.
