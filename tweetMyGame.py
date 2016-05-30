@@ -4,14 +4,14 @@ import time
 import logging
 
 # Retrieves information about the player's current game from Riot servers
-def getCurrentGameData(ID, key):
-	url = "https://na.api.pvp.net/observer-mode/rest/consumer/getSpectatorGameInfo/NA1/" + ID + "?api_key=" + key
+def getCurrentGameData(ID, region, key):
+	url = "https://" + region + ".api.pvp.net/observer-mode/rest/consumer/getSpectatorGameInfo/NA1/" + ID + "?api_key=" + key
 	response = requests.get(url)
 	return response.json()
 
 # Retrieves information about the player from Riot servers
-def getSumInfo(summonername, key):
-	url = "https://na.api.pvp.net/api/lol/na/v1.4/summoner/by-name/" + summonername + "?api_key=" + key
+def getSumInfo(summonername, region, key):
+	url = "https://" + region + ".api.pvp.net/api/lol/" + region + "/v1.4/summoner/by-name/" + summonername + "?api_key=" + key
 	response = requests.get(url)
 	return response.json()
 	
@@ -52,13 +52,14 @@ def tweetGame():
 		content.append(line.rstrip('\n'))
 	f.close()
 	summonername = content[0]
-	key = content[1]
-	my_auth = twitter.OAuth(content[2],content[3],content[4],content[5])
+	region = content[1]
+	key = content[2]
+	my_auth = twitter.OAuth(content[3],content[4],content[5],content[6])
 	
 	# Retrieves remaining variables from the API and formats them
 	# Retrieves summoner information
 	try:
-		summoner = getSumInfo(summonername, key)
+		summoner = getSumInfo(summonername, region, key)
 	except:
 		logging.exception('Could not retrieve summoner data.')
 	ID = summoner[summonername]['id']
@@ -67,7 +68,7 @@ def tweetGame():
 	
 	# Retrieves information about your current game
 	try:
-		game = getCurrentGameData(ID, key)
+		game = getCurrentGameData(ID, region, key)
 	except:
 		logging.exception('Could not retrieve current game data.')
 	gameID = game['gameId']
