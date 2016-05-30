@@ -1,4 +1,5 @@
 summonernamenocapsorspaces
+regioninitials
 riot-games-api-key
 twitter-access-token
 twitter-access-token-secret
