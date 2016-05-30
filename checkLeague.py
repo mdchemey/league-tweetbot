@@ -40,7 +40,6 @@ def looper():
 		time.sleep(10)
 	# after tweeting, it waits until the game ends and then starts the loop over
 	while a is True:
-		time.sleep(10)
 		a=findProcess("League of Legends.exe")
 		if a is False and skip is False:
 			print "Game ended. Waiting for Match History servers to update."
@@ -54,6 +53,7 @@ def looper():
 			logging.info('Game ended. Skipping postgame tweet due to previous failure.')
 			print "Game ended. Skipping postgame tweet due to previous failure."
 			looper()
+		time.sleep(10)
 
 def main():
 	logging.basicConfig(filename='checkLog.log',level=logging.INFO,filemode='w',format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
