@@ -4,8 +4,8 @@ import time
 import logging
 
 # Retrieves detailed information about your most recent match from Riot servers
-def getMatchInfo(matchID, key):
-	url = "https://na.api.pvp.net/api/lol/na/v2.2/match/" + matchID + "?api_key=" + key
+def getMatchInfo(matchID, region, key):
+	url = "https://" + region + ".api.pvp.net/api/lol/" + region + "/v2.2/match/" + matchID + "?api_key=" + key
 	response = requests.get(url)
 	return response.json()
 		
@@ -33,8 +33,9 @@ def tweetLast(count):
 	for line in userInfo:
 		content.append(line.rstrip('\n'))
 	userInfo.close()
-	key = content[1]
-	my_auth = twitter.OAuth(content[2],content[3],content[4],content[5])
+	region = content[1]
+	key = content[2]
+	my_auth = twitter.OAuth(content[3],content[4],content[5],content[6])
 	
 	# Opens file created in tweetMyGame and retrieves information about your last game
 	latestInfo = open('DONOTTOUCH.txt')
@@ -52,7 +53,7 @@ def tweetLast(count):
 		
 	# Retrieve data on your most recent game once the server has updated
 	try:
-		match = getMatchInfo(game, key)
+		match = getMatchInfo(game, region, key)
 	except:
 		print "Could not retrieve recent match data. Retrying... %d" % count
 		logging.exception("Could not retrieve recent match data. Retrying... %d" % count)
